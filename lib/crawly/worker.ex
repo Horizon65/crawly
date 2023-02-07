@@ -68,10 +68,17 @@ defmodule Crawly.Worker do
   @spec get_response({request, spider_name}, opts) :: result
         when request: Crawly.Request.t(),
              spider_name: atom(),
-             opts: list(),
+             opts: map(),
              response: HTTPoison.Response.t(),
              result: {:ok, {response, spider_name}} | {:error, term()}
-  def get_response({request, spider_name}, opts \\ []) do
+  def get_response({request, spider_name}, opts \\ %{}) do
+    opts =
+      if(is_map(opts),
+        do:
+          opts |> Map.drop([:with, :request_options, :headers]) |> Enum.into([]),
+        else: []
+      )
+
     # check if spider-level fetcher is set. Overrides the globally configured fetcher.
     # if not set, log warning for explicit config preferred,
     # get the globally-configured fetcher. Defaults to HTTPoisonFetcher
