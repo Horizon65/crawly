@@ -70,7 +70,9 @@ defmodule Crawly do
       )
 
     {%{} = request, _} = Crawly.Utils.pipe(request0.middlewares, request0, %{})
-    {:ok, {response, _}} = Crawly.Worker.get_response({request, opts[:with]})
+
+    {:ok, {response, _}} =
+      Crawly.Worker.get_response({request, opts[:with]}, opts)
 
     case opts[:with] do
       nil ->

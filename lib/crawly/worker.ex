@@ -65,12 +65,13 @@ defmodule Crawly.Worker do
   end
 
   @doc false
-  @spec get_response({request, spider_name}) :: result
+  @spec get_response({request, spider_name}, opts) :: result
         when request: Crawly.Request.t(),
              spider_name: atom(),
+             opts: list(),
              response: HTTPoison.Response.t(),
              result: {:ok, {response, spider_name}} | {:error, term()}
-  def get_response({request, spider_name}) do
+  def get_response({request, spider_name}, opts \\ []) do
     # check if spider-level fetcher is set. Overrides the globally configured fetcher.
     # if not set, log warning for explicit config preferred,
     # get the globally-configured fetcher. Defaults to HTTPoisonFetcher
@@ -83,6 +84,7 @@ defmodule Crawly.Worker do
       )
       |> Crawly.Utils.unwrap_module_and_options()
 
+    options = if(is_list(opts), do: options ++ opts, else: options)
     retry_options = Crawly.Utils.get_settings(:retry, spider_name, [])
     retry_codes = Keyword.get(retry_options, :retry_codes, [])
 
